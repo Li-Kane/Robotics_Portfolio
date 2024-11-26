@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robotics Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 id="header">Kane Li Robotics Portfolio</h1>
+    </header>
+    <main>
+        <section id="about-me">
+            <h2>About Me</h2>
+            <p>
+                Hello, my name is Kane Li! Currently I am an Autonomy lead for Triton Robotics, a team that participates in 3 vs 3 robot battles.
+                According to the rules, one of the 3 robots must be fully autonomous, and that is where I come in. My subteam has been
+                working to develop an autonomous system from the ground up, shown through a couple of the projects below. I hope
+                to continue to develop my skills in order to learn best practices and new skills that will only only improve my own
+                abilities, but also enable me to take those skills back to my team and help them grow as well. My current interests include robotics sensing,
+                controls, and reinforcement learning.
+            </p>
+        </section>
+        <section id="projects">
+            <div class="project">
+                <h2>Serial Communications</h2>
+                <video controls muted>
+                    <source src="./resources/serial_comms.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p class="project-description">
+                    This project was my first real task in Triton Robotics, where I helped to establish communications so our code that runs on
+                    an NVIDIA Jetson can communicate with the Embedded team's STM32 to make the robot move. After g with a member from Embedded
+                    to decide upon a protocol, we used UART to send data between each other. Once communication was established, I then created a ROS2
+                    service that allows other nodes to both read requests and write requests to acess the serial data. Here are a few more details:
+                </p>
+                <ul>
+                    <li>Data was sent by writing bytes to the file "/ttySH1" (or "/USB0" if on a laptop), and verified using an LRC Checksum</li>
+                    <li>We read data at approximately 10 messages per second, and the service response time was within the range of 0.1 seconds</li>
+                    <li>The ROS2 service constantly listened to Embedded data of current robot state, and would write desired state to Embedded</li>
+                </ul>
+            </div>
+            <div class="project">
+                <h2>Simulations</h2>
+                <video controls>
+                    <source src="./resources/sim_video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p class="project-description">
+                    Once I became team lead, I expanded the size of the team, which requires more ways for people to run code on the "robot".
+                    Therefore, I wrote this short pybullet simulation that loads a URDF model of our robot and listens to topic data about desired
+                    state. Whenever desired state is received, on the next update the robot moves towards the desired state. Additionally, there is
+                    a camera view in front of the turret, mimicking our real robots. In the future, I hope to add ballistics and motion-planning.
+                </p>
+                <ul>
+                    <li>The URDF model was generated from a modified SOLIDWORKS CAD</li>
+                    <li>Camera view was calculated using projection and view matrices, where the green debug line in the video is the camera forward direction</li>
+                    <li>The ROS2 node keeps track of desired pitch and yaw, and updates pybullet's joints to move in that direction</li>
+                </ul>
+            </div>
+            <div class="project">
+                <h2>Aim-to-Center</h2>
+                <video controls>
+                    <source src="./resources/aim-to-center.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p class="project-description">
+                    In order to get the robot to shoot at the proper direction, we are developing a naive implementation of centering detected armor
+                    panels into our turret view. My main role here has been coordinating the members working on armor plate detections with our aiming
+                    logic, as well as syncing up the camera and robot position sensor data. To sync the data, we make use of service callbacks, passing our
+                    current camera view to be synced with the current robot position. In the future, we may seek to timestamp our data and use ROS message 
+                    filters to better sync this differing sensor data.
+                </p>
+                <ul>
+                    <li>The video above simple prints the desired direction to turn for debugging purposes</li>
+                    <li>To interpolate camera-pixels to desired angle, we used a python calibration script and real-life measurements.</li>
+                    <li>Detections data comes in at roughly 30hz compared to robot state at 10hz, hence our need for synchronization</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
