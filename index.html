@@ -21,8 +21,8 @@
                 According to the rules, one of the 3 robots must be fully autonomous, and that is where I come in. My subteam has been
                 working to develop an autonomous system from the ground up, shown through a couple of the projects below. I hope
                 to continue to develop my skills in order to learn best practices and new skills that will only only improve my own
-                abilities, but also enable me to take those skills back to my team and help them grow as well. My current interests include robotics sensing,
-                controls, and reinforcement learning.
+                abilities, but also enable me to take those skills back to my team and help them grow as well. My current interests include robotics sensing, 
+                motion-planning, and computer vision.
             </p>
         </section>
         <section id="projects">
@@ -34,14 +34,15 @@
                 </video>
                 <p class="project-description">
                     This project was my first real task in Triton Robotics, where I helped to establish communications so our code that runs on
-                    an NVIDIA Jetson can communicate with the Embedded team's STM32 to make the robot move. After g with a member from Embedded
+                    an NVIDIA Jetson can communicate with the Embedded team's STM32 to make the robot move. After talking with a member from Embedded
                     to decide upon a protocol, we used UART to send data between each other. Once communication was established, I then created a ROS2
-                    service that allows other nodes to both read requests and write requests to acess the serial data. Here are a few more details:
+                    service that allows other nodes to both read requests and write requests to acess the serial data. Currently, we are working on 
+                    improving the real-time constraints of the system, addressing data misalignment, inconsistent latencies, and data corruption.
                 </p>
                 <ul>
+                    <li>The video above is an old example of receiving current robot position and velocity from the Embedded side</li>
                     <li>Data was sent by writing bytes to the file "/ttySH1" (or "/USB0" if on a laptop), and verified using an LRC Checksum</li>
-                    <li>We read data at approximately 10 messages per second, and the service response time was within the range of 0.1 seconds</li>
-                    <li>The ROS2 service constantly listened to Embedded data of current robot state, and would write desired state to Embedded</li>
+                    <li>Our BAUD rate is around 115200 bits per second. The wiring is from the Jetson ttl pinout to JST pin connection</li>
                 </ul>
             </div>
             <div class="project">
@@ -52,33 +53,34 @@
                 </video>
                 <p class="project-description">
                     Once I became team lead, I expanded the size of the team, which requires more ways for people to run code on the "robot".
-                    Therefore, I wrote this short pybullet simulation that loads a URDF model of our robot and listens to topic data about desired
-                    state. Whenever desired state is received, on the next update the robot moves towards the desired state. Additionally, there is
-                    a camera view in front of the turret, mimicking our real robots. In the future, I hope to add ballistics and motion-planning.
+                    Therefore, I wrote this a pybullet simulation that loads a URDF model that interfaces with ROS. Users are able to control 
+                    the robot movement using the arrow keys, and the camera view is calculated using projection and view matrices. There also is
+                    a ROS2 service that handles moving the pitch and yaw of the turret, mimicking serial communication with our real robot.
                 </p>
                 <ul>
-                    <li>The URDF model was generated from a modified SOLIDWORKS CAD</li>
-                    <li>Camera view was calculated using projection and view matrices, where the green debug line in the video is the camera forward direction</li>
+                    <li>The video demonstrates a recruit's work on testing SLAM algorithms with a simualted LIDAR. We simulated a LIDAR by shooting ray batches and checking for collisions.</li>
+                    <li>Camera view was calculated using projection and view matrices, based on the forward direction from the turret link</li>
                     <li>The ROS2 node keeps track of desired pitch and yaw, and updates pybullet's joints to move in that direction</li>
                 </ul>
             </div>
             <div class="project">
-                <h2>Aim-to-Center</h2>
+                <h2>Image Processing</h2>
                 <video controls>
-                    <source src="./resources/aim_to_center.mp4" type="video/mp4">
+                    <source src="./resources/image_processing.mp4" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
                 <p class="project-description">
-                    In order to get the robot to shoot at the proper direction, we are developing a naive implementation of centering detected armor
-                    panels into our turret view. My main role here has been coordinating the members working on armor plate detections with our aiming
-                    logic, as well as syncing up the camera and robot position sensor data. To sync the data, we make use of service callbacks, passing our
-                    current camera view to be synced with the current robot position. In the future, we may seek to timestamp our data and use ROS message 
-                    filters to better sync this differing sensor data.
+                    Currently, the robot uses a yolov5 model to conduct image segmentation on camera imagery to find bounding boxes for armor plates.
+                    We are also working to extend this functionality to determine the color, type, and distance that the armor plate is from the robot.
+                    To do so, we utilize OpenCV, where in the video above we are drawing the bounding boxes, coloring the bounding box according to the
+                    armor plate color, and drawing where we determine the lightbars to be (for solve PnP). A major point of interest for us is to reduce
+                    the latency of communication between our camera, detector, and image processor using no-copy message transport since our current aiming
+                    system is not as responsive as we would like.
                 </p>
                 <ul>
-                    <li>The video above simple prints the desired direction to turn for debugging purposes</li>
-                    <li>To interpolate camera-pixels to desired angle, we used a python calibration script and real-life measurements.</li>
-                    <li>Detections data comes in at roughly 30hz compared to robot state at 10hz, hence our need for synchronization</li>
+                    <li>The video demonstrates the program drawing matching color bounding boxes with white lines for where it detects lightbars</li>
+                    <li>There was a little delay to the video since the image is only updated whenever the robot sees a detection</li>
+                    <li>Our image segmentation model runs on the GPU using CUDA, and is trained using a team labeled custom dataset</li>
                 </ul>
             </div>
         </section>
